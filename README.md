@@ -1,3 +1,67 @@
+## Pretraining ConvMAE on MAF
+Original repo: https://github.com/Alpha-VL/ConvMAE
+## Usage
+
+### Install
+
+- Create a conda environment and activate it:
+```bash
+conda create -n convmae python=3.8
+conda activate convmae
+update-moreh --force
+```
+
+- Install pip packages
+
+```bash
+pip install tensorboard submitit
+```
+
+- Install `timm==0.3.2`
+
+```bash
+pip install timm==0.3.2
+```
+
+### Data preparation
+
+You can download the ImageNet-1K (suggest using a subset of ImageNet-100lcs from Moreh) [here](https://image-net.org) and prepare the ImageNet-1K follow this format:
+```tree data
+imagenet
+  ├── train
+      ├── class1
+      │   ├── img1.jpeg
+      │   ├── img2.jpeg
+      │   └── ...
+      ├── class2
+      │   ├── img3.jpeg
+      │   └── ...
+      └── ...
+```
+
+### Training
+To pretrain ConvMAE-Base with **multi-node distributed training**, run the following on 3 nodes with 8 GPUs each:
+
+```bash
+python submitit_pretrain.py \
+    --nodes 1 \
+    --batch_size 128 \
+    --model convmae_convvit_base_patch16 \
+    --norm_pix_loss \
+    --mask_ratio 0.75 \
+    --epochs 1600 \
+    --warmup_epochs 40 \
+    --blr 1.5e-4 --weight_decay 0.05 \
+    --data_path /nas/common_data/imagenet_100cls 2>&1 | tee convMAE_maf_bsize128.log
+```
+Note: 
+- on MAF v23.1.1, `shape` argument of `<image>.reshape()` is not recognized, if MAF not support it yet, please remove that `shape` argument to skip.
+- if numpy>=1.24 lead to `AttributeError: module 'numpy' has no attribute 'float'` error ->downgrade
+
+-------------------
+# Original readme
+----------
+
 <div align="center">
 <h3>[NeurIPS 2022] MCMAE: Masked Convolution Meets Masked Autoencoders</h3>
 
