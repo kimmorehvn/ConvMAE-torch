@@ -1,4 +1,5 @@
 ## Pretraining ConvMAE on MAF
+This model was tested on A100 and MAF (v23.1.1)
 Original repo: https://github.com/Alpha-VL/ConvMAE
 ## Usage
 
