@@ -41,10 +41,11 @@ imagenet
 ```
 
 ### Training
-To pretrain ConvMAE-Base with **multi-node distributed training**, run the following on 3 nodes with 8 GPUs each:
+To pretrain ConvMAE-Base with **multi-node distributed training**, run the following on single nodes, 4 gpus:
 
 ```bash
 python submitit_pretrain.py \
+    --ngpus 4 \
     --nodes 1 \
     --batch_size 128 \
     --model convmae_convvit_base_patch16 \
@@ -54,6 +55,21 @@ python submitit_pretrain.py \
     --warmup_epochs 40 \
     --blr 1.5e-4 --weight_decay 0.05 \
     --data_path /nas/common_data/imagenet_100cls 2>&1 | tee convMAE_maf_bsize128.log
+```
+
+### Finetuning and get evaluation numbers
+Run the following on single nodes, 1 gpu, for ex:
+```
+python submitit_finetune.py \
+    --ngpus 1 \
+    --nodes 1 \
+    --batch_size 32 \
+    --model convvit_base_patch16 \
+    --epochs 40 \
+    --warmup_epochs 10 \
+    --blr 5e-4 --layer_decay 0.65 \
+    --weight_decay 0.05 --drop_path 0.1 --reprob 0.25 --mixup 0.8 --cutmix 1.0 \
+    --dist_eval --data_path /NAS/common_data/imagenet_100cls 2>&1 | tee ConvMAE_finetuneEval_MAF.log
 ```
 Note: 
 - on MAF v23.1.1, `shape` argument of `<image>.reshape()` is not recognized, if MAF not support it yet, please remove that `shape` argument to skip.
